@@ -215,19 +215,6 @@ A fox wandered through the forest until it found a glowing lantern...
 
 The OLED never gates the serial REPL - if it fails to initialize (bad wiring, wrong address), you'll get a warning in the serial log and the REPL keeps working normally over UART only.
 
-## Media
-
-Replace these placeholders with real photos before publishing:
-
-| File | Description |
-|------|-------------|
-| `assets/esp32-oled.jpg` | ESP32 + OLED hardware photo |
-| `assets/oled-running.jpg` | OLED during generation |
-| `assets/serial-output.jpg` | UART serial output |
-| `assets/training-loss.png` | Training loss graph |
-| `assets/architecture.png` | Model / pipeline diagram |
-| `assets/demo.gif` | Boot → prompt → generation demo |
-
 ## Roadmap
 
 - Dynamic context window
