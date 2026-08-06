@@ -1,6 +1,21 @@
 # KISH-TLM32
+### A Tiny GPT-Style Transformer Running on ESP32
+![ESP32](https://img.shields.io/badge/ESP32-WROOM32-blue)
+![Language](https://img.shields.io/badge/C-C99-green)
+![Python](https://img.shields.io/badge/Python-3.10+-yellow)
+![Framework](https://img.shields.io/badge/ESP--IDF-v5+-red)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
 
-A tiny GPT-style transformer language model, trained from scratch in PyTorch and deployed on an ESP32-WROOM-32 using a custom C inference engine, with a live SSD1306 OLED status display.
+KISH-TLM32 is a GPT-style byte-level transformer language model built from scratch in PyTorch and deployed entirely on an ESP32-WROOM-32 using a custom C inference engine. It demonstrates the complete workflow from training and weight export to real-time inference on embedded hardware.
+
+## Goals
+
+KISH-TLM32 was built to:
+
+- Understand transformer internals.
+- Explore embedded language model inference.
+- Demonstrate an end-to-end training and deployment pipeline.
+- Provide a compact codebase that is easy to study and modify.
 
 ## Demo
 
@@ -22,9 +37,9 @@ A tiny GPT-style transformer language model, trained from scratch in PyTorch and
 
 ## What this actually is
 
-- **Byte-level GPT-style transformer (256-byte vocabulary)** — no BPE tokenizer, no SentencePiece; each token is a raw byte (0–255).
-- A 2-layer causal self-attention model written from scratch in PyTorch for training and in plain C99 for inference — no TFLite Micro, no ONNX runtime, nothing but `+ - * / exp sqrt`.
-- Weights live in flash as a compiled-in C array and are read directly from flash at inference time — no SRAM copy, no filesystem.
+- **Byte-level GPT-style transformer (256-byte vocabulary)** - no BPE tokenizer, no SentencePiece; each token is a raw byte (0–255).
+- A 2-layer causal self-attention model written from scratch in PyTorch for training and in plain C99 for inference - no TFLite Micro, no ONNX runtime, nothing but `+ - * / exp sqrt`.
+- Weights live in flash as a compiled-in C array and are read directly from flash at inference time - no SRAM copy, no filesystem.
 - A REPL over UART: type a story prompt, get a generated completion, with live progress mirrored on an OLED.
 
 Unlike many embedded AI demos, **KISH-TLM32 includes the complete pipeline:**
@@ -35,7 +50,19 @@ Unlike many embedded AI demos, **KISH-TLM32 includes the complete pipeline:**
 - Firmware
 - OLED interface
 
-All designed to work together — not a third-party checkpoint dropped onto a dev board.
+All designed to work together - not a third-party checkpoint dropped onto a dev board.
+
+## Project Overview
+
+| Feature | KISH-TLM32 |
+|---------|------------|
+| Architecture | GPT-style causal transformer |
+| Training | PyTorch |
+| Inference | A custom transformer inference engine written in C that mirrors the PyTorch model layer-for-layer. |
+| Tokenization | Byte-level (256 bytes) |
+| Hardware | ESP32-WROOM-32 |
+| Framework | ESP-IDF |
+| Display | SSD1306 OLED |
 
 ## Hardware
 
@@ -77,6 +104,7 @@ Measured from a release build with exported weights (`tlm32.map`):
 | Model parameters | 35,584 |
 | Vocabulary | 256 |
 | Context window | 64 tokens |
+| Weight precision | float32 |
 
 Weights stay in flash; inference scratch buffers live in static SRAM inside `tlm_model.c`.
 
@@ -127,6 +155,20 @@ A fox wandered through the forest until it found a glowing lantern...
 
 The model learns byte-level next-token prediction over this text, so **prompt format at inference time should match training format** for best results.
 
+## Model Architecture
+
+The model contains:
+
+- Token embedding
+- Positional embedding
+- 2 Transformer blocks
+- Multi-head self-attention
+- Feed-forward network
+- Layer normalization
+- Final linear projection
+  
+Each stage produces the input for the next one. The PyTorch model defines the architecture, the exporter converts trained weights into a C source file, and the ESP32 firmware performs inference using the same layer structure.
+
 ## Building
 
 ```bash
@@ -171,7 +213,7 @@ A fox wandered through the forest until it found a glowing lantern...
 | `THINKING... / TOKEN i / N / [progress bar]` | during generation, refreshed every 4 tokens |
 | `DONE / X MS/TOKEN / N TOKENS` + response preview | after generation |
 
-The OLED never gates the serial REPL — if it fails to initialize (bad wiring, wrong address), you'll get a warning in the serial log and the REPL keeps working normally over UART only.
+The OLED never gates the serial REPL - if it fails to initialize (bad wiring, wrong address), you'll get a warning in the serial log and the REPL keeps working normally over UART only.
 
 ## Media
 
@@ -193,13 +235,36 @@ Replace these placeholders with real photos before publishing:
 - Sampling improvements
 - ESP32-S3 optimizations
 
+## Decoding
+
+The current firmware uses greedy decoding (argmax). Future versions will include configurable temperature, top-k, and top-p sampling.
+
 ## Known limitations
 
-- **OLED font**: the built-in 5×7 font only covers uppercase A–Z, digits, and a handful of punctuation (`.` `:` `/` `%` `-` `!` `?` `'`) — see the comment in `oled.h` for why and how to swap in a full font table later if you want lowercase.
-- **Generation quality**: this is a ~35K parameter model. It's genuinely running real inference on real hardware, not a toy demo — but don't expect GPT-level coherence at this scale.
-- **Not build-tested against every ESP-IDF point release** — the model/math code has been verified byte-for-byte against a host-compiled build; if `idf.py build` throws an error in `oled.c`, check `driver/i2c_master.h` for your exact IDF version.
+- **OLED font**: the built-in 5×7 font only covers uppercase A–Z, digits, and a handful of punctuation (`.` `:` `/` `%` `-` `!` `?` `'`) - see the comment in `oled.h` for why and how to swap in a full font table later if you want lowercase.
+- **Generation quality**: this is a ~35K parameter model. It's genuinely running real inference on real hardware, not a toy demo - but don't expect GPT-level coherence at this scale.
+- **Not build-tested against every ESP-IDF point release** - the model/math code has been verified byte-for-byte against a host-compiled build; if `idf.py build` throws an error in `oled.c`, check `driver/i2c_master.h` for your exact IDF version.
 
 ## Troubleshooting
 
-- **`IDF_PATH not set`** — run your IDF's `export.sh`/`export.ps1` before `idf.py`.
-- **OLED shows nothing** — check wiring against the table above, confirm the I2C address is `0x3C` (some SSD1306 boards ship at `0x3D`), and watch the serial log for the `OLED not detected` warning at boot.
+- **`IDF_PATH not set`** - run your IDF's `export.sh`/`export.ps1` before `idf.py`.
+- **OLED shows nothing** - check wiring against the table above, confirm the I2C address is `0x3C` (some SSD1306 boards ship at `0x3D`), and watch the serial log for the `OLED not detected` warning at boot.
+## Acknowledgements
+
+This project was inspired by:
+
+- Andrej Karpathy's educational work on transformers
+- TinyStories
+- llama2.c
+- ESP-IDF
+- PyTorch
+
+## Note
+
+`tlm_weights_data.c` is generated by `tools/export_weights.py` and should be regenerated after every retraining. It is not intended to be edited by hand.
+
+## License
+
+This project is released under the MIT License. See the LICENSE file for details.
+
+
