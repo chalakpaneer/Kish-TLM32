@@ -1,0 +1,55 @@
+# ESP-IDF / CMake build outputs
+build/
+cmake-build-*/
+
+# Nested copy/build artifacts
+tlm32/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+
+# Training checkpoints and local model artifacts
+*.pt
+*.pth
+weights/
+tools/tlm32.pt
+
+# Generated weight blobs (re-export after training)
+components/tlm_core/src/tlm_weights_data.c
+tlm32/components/tlm_core/src/tlm_weights_data.c
+
+# Local ESP-IDF configuration
+sdkconfig
+sdkconfig.old
+sdkconfig.*
+!sdkconfig.defaults
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Archives
+*.zip
+*.7z
+*.tar
+*.gz
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Private local notes
+study.md
+
+# Keep assets/ in git; ignore large uncommitted media until added deliberately
+# assets/demo.gif is tracked once you record it
