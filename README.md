@@ -157,7 +157,9 @@ The model learns byte-level next-token prediction over this text, so **prompt fo
 
 ## Model Architecture
 
-The model contains:
+The transformer is intentionally compact so it can run on an ESP32-WROOM-32 without external PSRAM.
+
+The architecture consists of:
 
 - Token embedding
 - Positional embedding
