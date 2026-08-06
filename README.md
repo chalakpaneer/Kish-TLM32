@@ -35,7 +35,7 @@ KISH-TLM32 was built to:
 🚧 Quantization  
 🚧 KV-cache  
 
-## What this actually is
+## Inside KISH-TLM32
 
 - **Byte-level GPT-style transformer (256-byte vocabulary)** - no BPE tokenizer, no SentencePiece; each token is a raw byte (0–255).
 - A 2-layer causal self-attention model written from scratch in PyTorch for training and in plain C99 for inference - no TFLite Micro, no ONNX runtime, nothing but `+ - * / exp sqrt`.
