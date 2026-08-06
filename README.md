@@ -19,8 +19,9 @@ KISH-TLM32 was built to:
 
 ## Demo
 
-![OLED Demo](assets/demo.gif)
+![KISH-TLM32 Demo](assets/demo.gif)
 
+*A short demonstration showing the ESP32 booting, receiving a prompt over UART, and generating text while updating the SSD1306 OLED in real time.*
 
 ## Current Status
 
