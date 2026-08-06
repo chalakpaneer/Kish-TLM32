@@ -21,7 +21,6 @@ KISH-TLM32 was built to:
 
 ![OLED Demo](assets/demo.gif)
 
-> **Before publishing:** record a ~10 s GIF (boot → prompt → OLED updates → story generation) and save it as `assets/demo.gif`.
 
 ## Current Status
 
